@@ -1,0 +1,10 @@
+yfinance
+pandas
+numpy
+matplotlib
+statsmodels
+scipy
+scikit-learn
+tensorflow
+from_root
+-e .

@@ -1,0 +1,52 @@
+[ 2025-07-10 16:35:15,386 ] numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+[ 2025-07-10 16:35:26,190 ] root - INFO - Entered the start_data_ingestion method of TrainPipeline class
+[ 2025-07-10 16:35:26,191 ] root - INFO - Getting the data from yfinance api
+[ 2025-07-10 16:35:26,191 ] root - INFO - Entered initiate_data_ingestion method of Data_Ingestion class
+[ 2025-07-10 16:35:26,191 ] root - INFO - Exporting data from yfinace API
+[ 2025-07-10 16:35:26,192 ] yfinance - DEBUG - Entering history()
+[ 2025-07-10 16:35:26,194 ] peewee - DEBUG - ('CREATE TABLE IF NOT EXISTS "_tz_kv" ("key" VARCHAR(255) NOT NULL PRIMARY KEY, "value" VARCHAR(255)) WITHOUT ROWID', [])
+[ 2025-07-10 16:35:26,194 ] peewee - DEBUG - ('SELECT "t1"."key", "t1"."value" FROM "_tz_kv" AS "t1" WHERE ("t1"."key" = ?) LIMIT ? OFFSET ?', ['AAPL', 1, 0])
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG -  Entering history()
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG - AAPL: Yahoo GET parameters: {'range': '10y', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG -   Entering get()
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG -    Entering _make_request()
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG - url=https://query2.finance.yahoo.com/v8/finance/chart/AAPL
+[ 2025-07-10 16:35:26,253 ] yfinance - DEBUG - params={'range': '10y', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+[ 2025-07-10 16:35:26,254 ] yfinance - DEBUG -     Entering _get_cookie_and_crumb()
+[ 2025-07-10 16:35:26,254 ] yfinance - DEBUG - cookie_mode = 'basic'
+[ 2025-07-10 16:35:26,254 ] yfinance - DEBUG -      Entering _get_cookie_and_crumb_basic()
+[ 2025-07-10 16:35:26,254 ] yfinance - DEBUG -       Entering _get_cookie_basic()
+[ 2025-07-10 16:35:26,254 ] yfinance - DEBUG -        Entering _load_cookie_curlCffi()
+[ 2025-07-10 16:35:26,255 ] peewee - DEBUG - ('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+[ 2025-07-10 16:35:26,255 ] peewee - DEBUG - ('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG -        Exiting _load_cookie_curlCffi()
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG - reusing persistent cookie
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG -       Exiting _get_cookie_basic()
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG -       Entering _get_crumb_basic()
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG -        Entering _get_cookie_basic()
+[ 2025-07-10 16:35:26,255 ] yfinance - DEBUG - reusing cookie
+[ 2025-07-10 16:35:26,256 ] yfinance - DEBUG -        Exiting _get_cookie_basic()
+[ 2025-07-10 16:35:26,550 ] yfinance - DEBUG - crumb = 'mrqYbKwvVzW'
+[ 2025-07-10 16:35:26,551 ] yfinance - DEBUG -       Exiting _get_crumb_basic()
+[ 2025-07-10 16:35:26,551 ] yfinance - DEBUG -      Exiting _get_cookie_and_crumb_basic()
+[ 2025-07-10 16:35:26,552 ] yfinance - DEBUG -     Exiting _get_cookie_and_crumb()
+[ 2025-07-10 16:35:26,824 ] yfinance - DEBUG - response code=200
+[ 2025-07-10 16:35:26,824 ] yfinance - DEBUG -    Exiting _make_request()
+[ 2025-07-10 16:35:26,824 ] yfinance - DEBUG -   Exiting get()
+[ 2025-07-10 16:35:26,834 ] yfinance - DEBUG - AAPL: yfinance received OHLC data: 2015-07-13 13:30:00 -> 2025-07-10 20:00:00
+[ 2025-07-10 16:35:26,839 ] yfinance - DEBUG - AAPL: OHLC after cleaning: 2015-07-13 09:30:00-04:00 -> 2025-07-10 16:00:00-04:00
+[ 2025-07-10 16:35:26,858 ] yfinance - DEBUG - AAPL: OHLC after combining events: 2015-07-13 00:00:00-04:00 -> 2025-07-10 00:00:00-04:00
+[ 2025-07-10 16:35:26,861 ] yfinance - DEBUG - AAPL: yfinance returning OHLC: 2015-07-13 00:00:00-04:00 -> 2025-07-10 00:00:00-04:00
+[ 2025-07-10 16:35:26,861 ] yfinance - DEBUG -  Exiting history()
+[ 2025-07-10 16:35:26,861 ] yfinance - DEBUG - Exiting history()
+[ 2025-07-10 16:35:26,862 ] root - INFO - Got the data from mongodb
+[ 2025-07-10 16:35:26,862 ] root - INFO - Entered split_data_as_train_test method of Data_Ingestion class
+[ 2025-07-10 16:35:26,862 ] root - INFO - Performed train test split on the dataframe
+[ 2025-07-10 16:35:26,862 ] root - INFO - Exited split_data_as_train_test method of Data_Ingestion class
+[ 2025-07-10 16:35:26,863 ] root - INFO - Exporting train and test file path.
+[ 2025-07-10 16:35:26,882 ] root - INFO - Exported train and test file path.
+[ 2025-07-10 16:35:26,882 ] root - INFO - Performed train test split on the dataset
+[ 2025-07-10 16:35:26,882 ] root - INFO - Exited initiate_data_ingestion method of Data_Ingestion class
+[ 2025-07-10 16:35:26,882 ] root - INFO - Data ingestion artifact: DataIngestionArtifact(trained_file_path='artifact/07_10_2025_16_35_26/data_ingestion/ingested/AAPL_train.csv', test_file_path='artifact/07_10_2025_16_35_26/data_ingestion/ingested/AAPL_test.csv')
+[ 2025-07-10 16:35:26,882 ] root - INFO - Got the train_set and test_set from mongodb
+[ 2025-07-10 16:35:26,882 ] root - INFO - Exited the start_data_ingestion method of TrainPipeline class
