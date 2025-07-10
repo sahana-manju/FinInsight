@@ -9,11 +9,12 @@ MODEL_FILE_NAME = "model.pkl"
 
 TARGET_COLUMN = "Close"
 
-STOCK_COMPANY = "AAPL"
+STOCK_COMPANY = "AdPL"
 FILE_NAME: str = "data.csv"
 TRAIN_FILE_NAME: str = f"{STOCK_COMPANY}_train.csv"
 TEST_FILE_NAME: str = f"{STOCK_COMPANY}_test.csv"
 SCHEMA_FILE_PATH = os.path.join("config", "schema.yaml")
+LOOKBACK_PERIOD = '10'
 
 
 AWS_ACCESS_KEY_ID_ENV_KEY = "AWS_ACCESS_KEY_ID"

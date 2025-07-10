@@ -5,7 +5,7 @@ import yfinance as yf
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 
-from src.constants import STOCK_COMPANY
+from src.constants import STOCK_COMPANY, TARGET_COLUMN, LOOKBACK_PERIOD
 from src.entity.config_entity import DataIngestionConfig
 from src.entity.artifact_entity import DataIngestionArtifact
 from src.exception import MyException
@@ -35,14 +35,28 @@ class DataIngestion:
             # Define the ticker
             ticker = STOCK_COMPANY
 
+
             # Download historical data using yfinance
             stock_data = yf.Ticker(ticker)
-            df = stock_data.history(period='10y')
-            data = df.filter(['Close'])
+            df = stock_data.history(period=LOOKBACK_PERIOD)
+
+            # Data Validation module
+            if df.empty:
+                error_message = f"No data returned for ticker '{ticker}' with lookback period '{LOOKBACK_PERIOD}'. " \
+                                f"Check if the ticker or period is correct."
+                logging.error(error_message)
+                sys.exit(1)  # Exit with a non-zero code to indicate failure
+
+            # Check if TARGET_COLUMN exists
+            if TARGET_COLUMN not in df.columns:
+                error_message = f"Target column '{TARGET_COLUMN}' not found in the dataset. Available columns: {df.columns.tolist()}"
+                logging.error(error_message)
+                sys.exit(1)  # Exit with a non-zero code to indicate failure
+            data = df.filter([TARGET_COLUMN])
             return data
 
         except Exception as e:
-            raise MyException(e,sys)
+            raise
 
     def split_data_as_train_test(self,dataframe: DataFrame) ->None:
         """
@@ -69,7 +83,7 @@ class DataIngestion:
 
             logging.info(f"Exported train and test file path.")
         except Exception as e:
-            raise MyException(e, sys) from e
+            raise
 
     def initiate_data_ingestion(self) ->DataIngestionArtifact:
         """
@@ -100,4 +114,4 @@ class DataIngestion:
             logging.info(f"Data ingestion artifact: {data_ingestion_artifact}")
             return data_ingestion_artifact
         except Exception as e:
-            raise MyException(e, sys) from e
+            raise 

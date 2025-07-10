@@ -12,12 +12,13 @@ def error_message_detail(error: Exception, error_detail: sys) -> str:
     # Extract traceback details (exception information)
     _, _, exc_tb = error_detail.exc_info()
 
-    # Get the file name where the exception occurred
-    file_name = exc_tb.tb_frame.f_code.co_filename
-
-    # Create a formatted error message string with file name, line number, and the actual error
-    line_number = exc_tb.tb_lineno
-    error_message = f"Error occurred in python script: [{file_name}] at line number [{line_number}]: {str(error)}"
+    if exc_tb is not None:
+        file_name = exc_tb.tb_frame.f_code.co_filename
+        line_number = exc_tb.tb_lineno
+        error_message = f"Error occurred in Python script: [{file_name}] at line number [{line_number}]: {str(error)}"
+    else:
+        # Fallback if traceback is not available
+        error_message = f"Error: {str(error)} (No traceback available)"
     
     # Log the error for better tracking
     logging.error(error_message)
