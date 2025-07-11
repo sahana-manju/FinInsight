@@ -33,5 +33,6 @@ Data Transformation ralated constant start with DATA_TRANSFORMATION VAR NAME
 """
 DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
 PREPROCESSING_OBJECT_FILE_NAME: str = "scaler.pkl"
+TIMESTAMP = 60
 
 

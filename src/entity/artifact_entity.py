@@ -11,5 +11,7 @@ class DataIngestionArtifact:
 @dataclass
 class DataTransformationArtifact:
     transformed_object_file_path:str 
-    scaled_train_df : np.ndarray
-    scaled_test_df : np.ndarray
+    x_train: np.ndarray
+    y_train : np.ndarray
+    x_test: np.ndarray
+    y_test : np.ndarray

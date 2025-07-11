@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.compose import ColumnTransformer
 
 
-from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH
+from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH, TIMESTAMP
 from src.entity.config_entity import DataTransformationConfig
 from src.entity.artifact_entity import DataTransformationArtifact, DataIngestionArtifact
 from src.exception import MyException
@@ -66,6 +66,34 @@ class DataTransformation:
             logging.exception("Exception occurred in get_data_transformer_object method of DataTransformation class")
             raise
 
+    def convert_to_timesteps(self,scaled_data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Creates and returns a data transformer object for the data, 
+        including gender mapping, dummy variable creation, column renaming,
+        feature scaling, and type adjustments.
+        """
+        logging.info("Entered convert_to_timesteps method of DataTransformation class")
+
+        try:
+            x_train = []
+            y_train = []
+
+            for i in range(TIMESTAMP,len(scaled_data)):
+                x_train.append(scaled_data[i-TIMESTAMP:i,0])
+                y_train.append(scaled_data[i,0])
+            
+            x_train, y_train = np.array(x_train), np.array(y_train)
+
+            # Reshape the data (samples, timesteps, no of features)
+            x_train = np.reshape(x_train,(x_train.shape[0],x_train.shape[1],1))
+
+            return x_train,y_train
+            
+
+        except Exception as e:
+            logging.exception("Exception occurred in get_data_transformer_object method of DataTransformation class")
+            raise
+
 
     def initiate_data_transformation(self):
         """
@@ -91,6 +119,14 @@ class DataTransformation:
             input_feature_test_arr = preprocessor.transform(test_df)
             logging.info("Transformation done end to end to train-test df.")
 
+            logging.info("Timestep creation for Training-data")
+            x_train,y_train = self.convert_to_timesteps(input_feature_train_arr)
+            logging.info("Timestep creation for Testing-data")
+            x_test,y_test = self.convert_to_timesteps(input_feature_test_arr)
+            logging.info("Timestep creation done end to end to train-test df.")
+
+
+
             
 
             save_object(self.data_transformation_config.transformed_object_file_path, preprocessor)
@@ -98,7 +134,11 @@ class DataTransformation:
 
             logging.info("Data transformation completed successfully")
             return DataTransformationArtifact(
-                transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,scaled_train_df=input_feature_train_arr ,scaled_test_df=input_feature_test_arr
+                transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,
+                x_train=x_train,
+                y_train=y_train,
+                x_test=x_test,
+                y_test=y_test
             )
 
 
