@@ -52,7 +52,8 @@ class DataIngestion:
                 error_message = f"Target column '{TARGET_COLUMN}' not found in the dataset. Available columns: {df.columns.tolist()}"
                 logging.error(error_message)
                 sys.exit(1)  # Exit with a non-zero code to indicate failure
-            data = df.filter([TARGET_COLUMN])
+            df.reset_index(inplace=True)
+            data = df.filter(["Date",TARGET_COLUMN])
             return data
 
         except Exception as e:
