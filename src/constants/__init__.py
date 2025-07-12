@@ -35,4 +35,16 @@ DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
 PREPROCESSING_OBJECT_FILE_NAME: str = "scaler.pkl"
 TIMESTAMP = 60
 
+"""
+MODEL TRAINER related constant start with MODEL_TRAINER var name
+"""
+MODEL_TRAINER_DIR_NAME: str = "model_trainer"
+MODEL_TRAINER_TRAINED_MODEL_NAME: str = "model.pkl"
+MODEL_TRAINER_EXPECTED_SCORE: float = 0.6
+MODEL_TRAINER_MODEL_CONFIG_FILE_PATH: str = os.path.join("config", "model.yaml")
+OPTIMIZER: str = "adam"
+LOSS: str = "mean_squared_error"
+BATCH_SIZE: int= 1
+EPOCHS: int = 1
+
 

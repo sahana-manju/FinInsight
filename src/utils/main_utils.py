@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import dill
 import yaml
+import joblib
 from pandas import DataFrame
 
 from src.exception import MyException
@@ -31,18 +32,21 @@ def write_yaml_file(file_path: str, content: object, replace: bool = False) -> N
         raise MyException(e, sys) from e
 
 
+
 def load_object(file_path: str) -> object:
     """
-    Returns model/object from project directory.
-    file_path: str location of file to load
-    return: Model/Obj
+    Loads object using joblib or dill depending on what works.
     """
     try:
-        with open(file_path, "rb") as file_obj:
-            obj = dill.load(file_obj)
-        return obj
-    except Exception as e:
-        raise MyException(e, sys) from e
+        # Try joblib first (compatible with pickle and joblib)
+        return joblib.load(file_path)
+    except Exception as joblib_error:
+        try:
+            # Fallback to dill
+            with open(file_path, "rb") as file_obj:
+                return dill.load(file_obj)
+        except Exception as dill_error:
+            raise MyException(f"Failed to load object: joblib error: {joblib_error}, dill error: {dill_error}", sys)
 
 def save_numpy_array_data(file_path: str, array: np.array):
     """

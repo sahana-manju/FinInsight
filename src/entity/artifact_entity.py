@@ -15,3 +15,14 @@ class DataTransformationArtifact:
     y_train : np.ndarray
     x_test: np.ndarray
     y_test : np.ndarray
+
+@dataclass
+class MetricArtifact:
+    mse:float
+    mae:float
+    rmse:float
+
+@dataclass
+class ModelTrainerArtifact:
+    trained_model_file_path:str 
+    metric_artifact:MetricArtifact
