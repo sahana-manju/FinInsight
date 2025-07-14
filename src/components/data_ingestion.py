@@ -53,7 +53,7 @@ class DataIngestion:
                 logging.error(error_message)
                 sys.exit(1)  # Exit with a non-zero code to indicate failure
             df.reset_index(inplace=True)
-            data = df.filter(["Date",TARGET_COLUMN])
+            data = df.filter([TARGET_COLUMN])
             return data
 
         except Exception as e:
@@ -70,7 +70,9 @@ class DataIngestion:
         logging.info("Entered split_data_as_train_test method of Data_Ingestion class")
 
         try:
-            train_set, test_set = train_test_split(dataframe, test_size=self.data_ingestion_config.train_test_split_ratio)
+            training_data_len = int(len(dataframe) * 0.95)
+            train_set = dataframe[:training_data_len]
+            test_set = dataframe[training_data_len-60:]
             logging.info("Performed train test split on the dataframe")
             logging.info(
                 "Exited split_data_as_train_test method of Data_Ingestion class"

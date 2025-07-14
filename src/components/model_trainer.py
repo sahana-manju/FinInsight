@@ -54,23 +54,19 @@ class ModelTrainer:
             if x_test.dtype == object:
                 x_test = np.stack(x_test).astype(np.float32)
 
-            y_train = np.array(y_train).astype(np.float32)
-            y_test = np.array(y_test).astype(np.float32)
+            #y_train = np.array(y_train).astype(np.float32)
+            #y_test = np.array(y_test).astype(np.float32)
             model.fit(x_train, y_train, batch_size= self.model_trainer_config._batch_size, epochs= self.model_trainer_config._epochs)
             logging.info("Model training done.")
 
             predictions = model.predict(x_test)
-            pipeline = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
-
-            # Access the MinMaxScaler inside the ColumnTransformer
-            scaler = pipeline.named_steps["Preprocessor"].named_transformers_["MinMaxScaler"]
+            scaler = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
 
             # Inverse transform your predictions
             predictions = scaler.inverse_transform(predictions)
+            y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
            
-            
-
-
+           
             # Predictions and evaluation metrics
 
             # Root Mean Squared Error (RMSE)

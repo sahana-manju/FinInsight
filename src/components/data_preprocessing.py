@@ -5,7 +5,7 @@ import joblib
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.compose import ColumnTransformer
+#from sklearn.compose import ColumnTransformer
 
 
 from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH, TIMESTAMP
@@ -32,7 +32,7 @@ class DataTransformation:
         except Exception as e:
             raise MyException(e, sys)
 
-    def get_data_transformer_object(self) -> Pipeline:
+    def get_data_transformer_object(self) -> MinMaxScaler:
         """
         Creates and returns a data transformer object for the data, 
         including gender mapping, dummy variable creation, column renaming,
@@ -42,25 +42,26 @@ class DataTransformation:
 
         try:
             # Initialize transformers
-            min_max_scaler = MinMaxScaler()
+            scaler = MinMaxScaler(feature_range=(0, 1))
             logging.info("Transformers Initialized: StandardScaler-MinMaxScaler")
+            return scaler
 
-            # Load schema configurations
-            logging.info("Cols loaded from schema.")
+            # # Load schema configurations
+            # logging.info("Cols loaded from schema.")
 
-            # Creating preprocessor pipeline
-            preprocessor = ColumnTransformer(
-                transformers=[
-                    ("MinMaxScaler", min_max_scaler, [TARGET_COLUMN])
-                ],
-                remainder='passthrough'  # Leaves other columns as they are
-            )
+            # # Creating preprocessor pipeline
+            # preprocessor = ColumnTransformer(
+            #     transformers=[
+            #         ("MinMaxScaler", min_max_scaler, [TARGET_COLUMN])
+            #     ],
+            #     remainder='passthrough'  # Leaves other columns as they are
+            # )
 
-            # Wrapping everything in a single pipeline
-            final_pipeline = Pipeline(steps=[("Preprocessor", preprocessor)])
-            logging.info("Final Pipeline Ready!!")
-            logging.info("Exited get_data_transformer_object method of DataTransformation class")
-            return final_pipeline
+            # # Wrapping everything in a single pipeline
+            # final_pipeline = Pipeline(steps=[("Preprocessor", preprocessor)])
+            # logging.info("Final Pipeline Ready!!")
+            # logging.info("Exited get_data_transformer_object method of DataTransformation class")
+            # return final_pipeline
 
         except Exception as e:
             logging.exception("Exception occurred in get_data_transformer_object method of DataTransformation class")
