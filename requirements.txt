@@ -7,4 +7,5 @@ scipy
 scikit-learn
 tensorflow
 from_root
+mlflow
 -e .

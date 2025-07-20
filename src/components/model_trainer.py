@@ -12,7 +12,10 @@ from src.entity.config_entity import ModelTrainerConfig
 from src.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact, MetricArtifact
 from src.entity.estimator import LSTM_Model
 
+from src.constants import STOCK_COMPANY
 
+import mlflow
+import mlflow.keras
 
 
 class ModelTrainer:
@@ -25,68 +28,72 @@ class ModelTrainer:
         self.data_transformation_artifact = data_transformation_artifact
         self.model_trainer_config = model_trainer_config
 
-    def get_model_object_and_report(self, x_train: np.array, y_train: np.array,x_test: np.array, y_test: np.array) -> Tuple[object, object]:
-        """
-        Method Name :   get_model_object_and_report
-        Description :   This function trains a LSTM with specified parameters
-        
-        Output      :   Returns metric artifact object and trained model object
-        On Failure  :   Write an exception log and then raise an exception
-        """
+    def get_model_object_and_report(self, x_train: np.array, y_train: np.array,
+                                x_test: np.array, y_test: np.array) -> Tuple[object, object]:
         try:
             logging.info("Training LSTM with specified parameters")
+            mlflow.set_tracking_uri("http://127.0.0.1:5000")
+            with mlflow.start_run(run_name="LSTM_Model_Training"):
+                # Log Tag
+                mlflow.set_tag("Company",STOCK_COMPANY)
+                # Log parameters
+                mlflow.log_param("optimizer", self.model_trainer_config._optimizer)
+                mlflow.log_param("loss_function", self.model_trainer_config._loss)
+                mlflow.log_param("batch_size", self.model_trainer_config._batch_size)
+                mlflow.log_param("epochs", self.model_trainer_config._epochs)
 
-            # Build the LSTM model
-            model = Sequential()
-            model.add(LSTM(128, return_sequences=True, input_shape= (x_train.shape[1], 1)))
-            model.add(LSTM(64, return_sequences=False))
-            model.add(Dense(25))
-            model.add(Dense(1))
+                # Build the LSTM model
+                model = Sequential()
+                model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+                model.add(LSTM(64, return_sequences=False))
+                model.add(Dense(25))
+                model.add(Dense(1))
 
-            # Compile the model
-            model.compile(optimizer= self.model_trainer_config._optimizer , loss= self.model_trainer_config._loss)
+                model.compile(optimizer=self.model_trainer_config._optimizer, loss=self.model_trainer_config._loss)
 
-            # Train the model
-            logging.info("Model training going on...")
-            # Ensure proper dtypes and shapes
-            if x_train.dtype == object:
-                x_train = np.stack(x_train).astype(np.float32)
-            if x_test.dtype == object:
-                x_test = np.stack(x_test).astype(np.float32)
+                # Convert data types if necessary
+                if x_train.dtype == object:
+                    x_train = np.stack(x_train).astype(np.float32)
+                if x_test.dtype == object:
+                    x_test = np.stack(x_test).astype(np.float32)
 
-            #y_train = np.array(y_train).astype(np.float32)
-            #y_test = np.array(y_test).astype(np.float32)
-            model.fit(x_train, y_train, batch_size= self.model_trainer_config._batch_size, epochs= self.model_trainer_config._epochs)
-            logging.info("Model training done.")
+                model.fit(x_train, y_train,
+                        batch_size=self.model_trainer_config._batch_size,
+                        epochs=self.model_trainer_config._epochs)
 
-            predictions = model.predict(x_test)
-            scaler = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
+                logging.info("Model training done.")
 
-            # Inverse transform your predictions
-            predictions = scaler.inverse_transform(predictions)
-            y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
-           
-           
-            # Predictions and evaluation metrics
+                predictions = model.predict(x_test)
+                scaler = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
 
-            # Root Mean Squared Error (RMSE)
-            rmse = np.sqrt(np.mean((predictions - y_test) ** 2))
-            print("RMSE:", rmse)
+                predictions = scaler.inverse_transform(predictions)
+                y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
 
-            # Mean Absolute Error (MAE)
-            mae = np.mean(np.abs(predictions - y_test))
-            print("MAE:", mae)
+                # Calculate metrics
+                rmse = np.sqrt(np.mean((predictions - y_test) ** 2))
+                mae = np.mean(np.abs(predictions - y_test))
+                mse = np.mean((predictions - y_test) ** 2)
 
-            # Mean Squared Error (MSE)
-            mse = np.mean((predictions - y_test) ** 2)
-            print("MSE:", mse)
+                print("RMSE:", rmse)
+                print("MAE:", mae)
+                print("MSE:", mse)
 
-            # Creating metric artifact
-            metric_artifact = MetricArtifact(mse=mse, mae=mae, rmse=rmse)
-            return model, metric_artifact
-        
+                # Log metrics
+                mlflow.log_metric("rmse", rmse)
+                mlflow.log_metric("mae", mae)
+                mlflow.log_metric("mse", mse)
+
+                mlflow.keras.log_model(
+                    model,
+                    name="lstm_model",
+                )
+
+                metric_artifact = MetricArtifact(mse=mse, mae=mae, rmse=rmse)
+                return model, metric_artifact
+
         except Exception as e:
             raise MyException(e, sys) from e
+
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         logging.info("Entered initiate_model_trainer method of ModelTrainer class")

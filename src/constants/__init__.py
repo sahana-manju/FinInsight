@@ -9,7 +9,7 @@ MODEL_FILE_NAME = "model.pkl"
 
 TARGET_COLUMN = "Close"
 
-STOCK_COMPANY = "AAPL"
+STOCK_COMPANY = "MSFT"
 FILE_NAME: str = "data.csv"
 TRAIN_FILE_NAME: str = f"{STOCK_COMPANY}_train.csv"
 TEST_FILE_NAME: str = f"{STOCK_COMPANY}_test.csv"
