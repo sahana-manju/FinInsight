@@ -37,3 +37,9 @@ class ModelTrainerConfig:
     _loss: str = LOSS
     _batch_size: int = BATCH_SIZE 
     _epochs:int = EPOCHS
+
+@dataclass
+class TrainPopularConfig:
+    models_popular_dir: str = os.path.join(training_pipeline_config.artifact_dir, MODELS_POPULAR_DIR_NAME)
+    scaled_models_file_path: str=os.path.join(training_pipeline_config.artifact_dir,SCALED_POPULAR_DIR_NAME)
+   

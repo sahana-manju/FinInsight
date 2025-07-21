@@ -26,3 +26,8 @@ class MetricArtifact:
 class ModelTrainerArtifact:
     trained_model_file_path:str 
     metric_artifact:MetricArtifact
+
+@dataclass
+class ModelPpoularTrainerArtifact:
+    models_popular_file_path:str 
+  

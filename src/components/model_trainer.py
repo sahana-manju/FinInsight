@@ -12,7 +12,7 @@ from src.entity.config_entity import ModelTrainerConfig
 from src.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact, MetricArtifact
 from src.entity.estimator import LSTM_Model
 
-from src.constants import STOCK_COMPANY
+from src.constants import STOCK_COMPANY, LOOKBACK_PERIOD, POPULAR_TICKERS
 
 import mlflow
 import mlflow.keras
@@ -33,9 +33,10 @@ class ModelTrainer:
         try:
             logging.info("Training LSTM with specified parameters")
             mlflow.set_tracking_uri("http://127.0.0.1:5000")
-            with mlflow.start_run(run_name="LSTM_Model_Training"):
+            with mlflow.start_run(run_name="Mae_trial"):
                 # Log Tag
                 mlflow.set_tag("Company",STOCK_COMPANY)
+                mlflow.set_tag("Lookback",LOOKBACK_PERIOD)
                 # Log parameters
                 mlflow.log_param("optimizer", self.model_trainer_config._optimizer)
                 mlflow.log_param("loss_function", self.model_trainer_config._loss)
@@ -50,6 +51,10 @@ class ModelTrainer:
                 model.add(Dense(1))
 
                 model.compile(optimizer=self.model_trainer_config._optimizer, loss=self.model_trainer_config._loss)
+
+                # Log model architecture as JSON
+                architecture_json = model.to_json()
+                mlflow.log_text(architecture_json, "model_architecture.json")
 
                 # Convert data types if necessary
                 if x_train.dtype == object:
@@ -92,7 +97,7 @@ class ModelTrainer:
                 return model, metric_artifact
 
         except Exception as e:
-            raise MyException(e, sys) from e
+            raise 
 
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:

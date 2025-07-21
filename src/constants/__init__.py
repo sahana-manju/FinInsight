@@ -33,7 +33,7 @@ Data Transformation ralated constant start with DATA_TRANSFORMATION VAR NAME
 """
 DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
 PREPROCESSING_OBJECT_FILE_NAME: str = "scaler.pkl"
-TIMESTAMP = 60
+TIMESTAMP = 30
 
 """
 MODEL TRAINER related constant start with MODEL_TRAINER var name
@@ -46,5 +46,23 @@ OPTIMIZER: str = "adam"
 LOSS: str = "mean_squared_error"
 BATCH_SIZE: int= 1
 EPOCHS: int = 1
+
+"""
+POPULAR COMPANIES
+"""
+POPULAR_TICKERS = [
+    'AAPL', 'MSFT'
+    #'TSLA', 'NVDA', 'GOOGL', 'AMZN', 'META',
+    # 'JNJ', 'JPM', 'V', 'MA', 'UNH', 'PG', 'HD', 'BAC', 'DIS', 
+    # 'XOM', 'CVX', 'PFE', 'KO', 'PEP', 'WMT', 'CSCO', 'NFLX',
+    # 'NKE', 'LLY', 'CRM', 'ABBV', 'T', 'MCD', 'ADBE', 'INTC',
+    # 'CMCSA', 'AMD', 'BA', 'COST', 'WFC', 'GE', 'TMO', 'QCOM',
+    # 'TXN', 'BMY', 'NEE', 'SBUX', 'HON', 'PYPL', 'LIN', 'AVGO',
+    # 'LOW', 'UPS'
+]
+MODELS_POPULAR_DIR_NAME: str = "saved_models"
+MODELS_POPULAR_FILE_NAME: str = "model.keras"
+SCALED_POPULAR_DIR_NAME: str = "scaled_models"
+
 
 
