@@ -153,7 +153,7 @@ class TrainPipeline_Popular:
                     batch_size=self.model_trainer_config._batch_size,
                     epochs=self.model_trainer_config._epochs)
             
-
+            os.makedirs(self.popular_train_config.models_popular_dir,exist_ok=True)
             model.save(os.path.join(self.popular_train_config.models_popular_dir, f"{ticker}_model.keras"))
 
 

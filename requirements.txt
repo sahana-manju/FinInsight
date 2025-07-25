@@ -8,4 +8,7 @@ scikit-learn
 tensorflow
 from_root
 mlflow
+fastapi
+uvicorn
+python-multipart
 -e .

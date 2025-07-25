@@ -51,8 +51,8 @@ EPOCHS: int = 1
 POPULAR COMPANIES
 """
 POPULAR_TICKERS = [
-    'AAPL', 'MSFT'
-    #'TSLA', 'NVDA', 'GOOGL', 'AMZN', 'META',
+    'AAPL', 'MSFT',
+'TSLA', 'NVDA', 'GOOGL', 'AMZN', 'META',
     # 'JNJ', 'JPM', 'V', 'MA', 'UNH', 'PG', 'HD', 'BAC', 'DIS', 
     # 'XOM', 'CVX', 'PFE', 'KO', 'PEP', 'WMT', 'CSCO', 'NFLX',
     # 'NKE', 'LLY', 'CRM', 'ABBV', 'T', 'MCD', 'ADBE', 'INTC',
