@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from src.pipline.prediction_pipeline import PredictionPipeline
+import numpy as np
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -23,12 +25,9 @@ async def forecast(
     stock_percent: list[float] = Form(...)
 ):
     total_percent = sum(stock_percent)
-    growth_rate = 0.05  # 5% mock monthly growth
-    allocations = []
-    weighted_growth = 0
 
+    allocations = []
     for name, percent in zip(stock_name, stock_percent):
-        weighted_growth += (percent / 100) * growth_rate
         allocations.append({"stock": name, "percent": percent})
 
     if round(total_percent, 2) != 100.0:
@@ -36,16 +35,46 @@ async def forecast(
             "request": request,
             "error": f"Total allocation must be 100%, got {total_percent:.2f}%",
             "portfolio": portfolio,
-            "allocations": allocations,
+            "allocations":allocations,
             "stock_options": STOCK_OPTIONS
         })
+    
+    stock_options = [STOCK_MAPPING[i] for i in stock_name]
+    weights = [i/100 for i in stock_percent]
 
-    forecasted_value = round(portfolio * (1 + weighted_growth), 2)
+    pipeline = PredictionPipeline(portfolio,stock_options,weights)
+    forecast_df = pipeline.run_pipeline()
+
+     # Daily percent returns
+    returns = forecast_df.pct_change().dropna()
+
+    # Portfolio returns (dot product of weights and daily returns)
+    portfolio_returns = returns.dot(weights)
+
+    # Cumulative portfolio value (e.g., starting at $1000)
+    forecasted_value = (1 + portfolio_returns).cumprod() * portfolio
+    forecasted_value = round(forecasted_value.iloc[-1],2)
+
+    # Daily metrics
+    #mean_return = portfolio_returns.mean()
+    volatility = portfolio_returns.std()
+
+    # Value at Risk (95% confidence)
+    #VaR_95 = -np.percentile(portfolio_returns, 5)
+
+    if volatility > 0.02:
+        risk_message = "Alert: High portfolio volatility. Consider diversification."
+    else:
+        risk_message = "Stable portfolio: Volatility is within a manageable range."
+    
 
     return templates.TemplateResponse("index.html", {
         "request": request,
         "forecast": forecasted_value,
         "portfolio": portfolio,
-        "allocations": allocations,
-        "stock_options": STOCK_OPTIONS
+        "stock_options": STOCK_OPTIONS,
+         "allocations":allocations,
+        "risk_message": risk_message,
+         "forecast_data_json": forecast_df.to_json(),  # Send as JSON
+
     })

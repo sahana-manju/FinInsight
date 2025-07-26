@@ -27,7 +27,4 @@ function removeStockRow(button) {
     if (row) row.remove();
 }
 
-function showDashboard() {
-    const dashboard = document.getElementById('dashboard');
-    if (dashboard) dashboard.style.display = 'block';
-}
+

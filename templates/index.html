@@ -6,6 +6,7 @@
     <script>
         const STOCK_OPTIONS = {{ stock_options | tojson }};
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/script.js" defer></script>
 </head>
 <body class="bg-light m-4">
@@ -72,22 +73,113 @@
             <div class="card-body">
                 <p><strong>Original Portfolio:</strong> ${{ portfolio }}</p>
                 <p><strong>Forecasted Value (Next Month):</strong> ${{ forecast }}</p>
-                <button class="btn btn-outline-info" onclick="showDashboard()">Show Detail</button>
+                <p><strong>{{risk_message}}</strong> </p>
+                <button class="btn btn-outline-info" onclick="showDashboard()">Show Dashboard</button>
 
                 <div id="dashboard" class="mt-4" style="display: none;">
                     <h5>Allocation Breakdown</h5>
-                    <ul class="list-group">
-                        {% for item in allocations %}
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>{{ item.stock }}</span>
-                            <span>{{ item.percent }}%</span>
-                        </li>
+                    <ul class="list-group" id="allocation-list">
+                        {% for allocation in allocations %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                {{ allocation.stock }} — {{ allocation.percent }}%
+                            </li>
                         {% endfor %}
                     </ul>
+              
+                
+                    <hr>
+                    <h5 class="mt-4">📈 Forecasted Prices per Company</h5>
+                    <canvas id="forecastChart" height="150"></canvas>
+                
+                    <h5 class="mt-5">📉 Risk Overview</h5>
+                    <canvas id="riskChart" height="100"></canvas>
                 </div>
             </div>
         </div>
     {% endif %}
 </div>
 </body>
+<script>
+    function showDashboard() {
+        document.getElementById("dashboard").style.display = "block";
+
+    
+        // Parse JSON passed from backend safely
+        const rawData = '{{ forecast_data_json | safe }}';
+    const forecastData = JSON.parse(rawData);
+
+    const firstTicker = Object.keys(forecastData)[0];
+    const labels = Object.keys(forecastData[firstTicker]);
+
+    const COLORS = [
+        '#007bff', '#28a745', '#dc3545', '#ffc107',
+        '#6610f2', '#fd7e14', '#20c997', '#6c757d'
+    ];
+
+    const datasets = Object.keys(forecastData).map((ticker, idx) => ({
+        label: ticker,
+        data: Object.values(forecastData[ticker]),
+        borderColor: COLORS[idx % COLORS.length],
+        fill: false,
+        tension: 0.3
+    }));
+
+    new Chart(document.getElementById('forecastChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '30-Day Forecast Per Stock'
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Day' } },
+                y: { title: { display: true, text: 'Price ($)' } }
+            }
+        }
+    });
+    
+        const volatilities = Object.entries(forecastData).map(([ticker, prices]) => {
+            const values = Object.values(prices);
+            const mean = values.reduce((a, b) => a + b, 0) / values.length;
+            const stdDev = Math.sqrt(values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length);
+            return { ticker, stdDev: stdDev.toFixed(2) };
+        });
+    
+        new Chart(document.getElementById('riskChart'), {
+            type: 'bar',
+            data: {
+                labels: volatilities.map(v => v.ticker),
+                datasets: [{
+                    label: 'Standard Deviation (Risk)',
+                    data: volatilities.map(v => v.stdDev),
+                    backgroundColor: volatilities.map(() => getRandomColor())
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Estimated Volatility per Stock'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+    
+    function getRandomColor() {
+        return 'hsl(' + Math.floor(Math.random() * 360) + ', 70%, 60%)';
+    }
+    showDashboard()
+    </script>
+    
 </html>
